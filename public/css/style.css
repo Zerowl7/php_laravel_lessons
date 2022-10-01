@@ -31,3 +31,15 @@ nav {
 .card-btn a{
     margin-right: 10px;
 }
+.card-header{
+    margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+.mybut{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.cat{
+    height: 500px;
+}

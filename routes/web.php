@@ -15,6 +15,12 @@ use App\Http\Controllers\PostController;
 
 Route::get('/', 'PostController@index');
 Route::resource('/post', 'PostController');
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+
+
 
 // Route::get('post/', 'PostController@index')->name('post.index');
 // Route::get('post/create', 'PostController@create')->name('post.create');
@@ -25,6 +31,4 @@ Route::resource('/post', 'PostController');
 
 // Route::post('post/', 'PostController@store')->name('post.store');
 // Route::delete('post/{id}', 'PostController@destroy')->name('post.destroy');
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');

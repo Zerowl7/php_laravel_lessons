@@ -5,11 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use Illuminate\Http\Request;
 use App\Post;
+use Auth;
+use Exception;
 use Str;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this -> middleware('auth')->except('index', 'show');
+    
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -64,7 +72,7 @@ class PostController extends Controller
         $post->short_title = Str::length($request->short_title)>30 ? Str::substr($request->short_title, 1, 30) . '...' :
         $request->title ;
         $post->descr = $request->descr;
-        $post->author_id = rand(1,4);
+        $post->author_id = \Auth::user()->id;
         #положить картинку
         if ($request->file('img')){
             $path = Storage::putFile('public', $request->file('img'));
@@ -84,7 +92,12 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::join('users', 'author_id', '=', 'users.id')->find($id);
+        if(!$post) {
+            return redirect()->route('post.index')->withErrors('Пост не существует');
+            }
         return view('posts.show', compact('post'));
+        
+        
 
     }
 
@@ -97,7 +110,17 @@ class PostController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
+        if(!$post) {
+            return redirect()->route('post.index')->withErrors('Пост не существует');
+            }
+        if($post->author_id != Auth::user()->id){
+            return redirect()->route('post.index')->withErrors('Не можете редактировать этот пост');
+            }
+        
+        
         return view('posts.edit', compact('post'));
+
+
     }
 
     /**
@@ -110,6 +133,12 @@ class PostController extends Controller
     public function update(PostRequest $request, $id)
     {
         $post = Post::find($id);
+        if(!$post) {
+            return redirect()->route('post.index')->withErrors('Пост не существует');
+            }
+        if($post->author_id != Auth::user()->id){
+            return redirect()->route('post.index')->withErrors('Не можете редактировать этот пост');
+            }
         $post->title = $request->title;
         $post->short_title = Str::length($request->short_title)>30 ? Str::substr($request->short_title, 1, 30) . '...' :
         $request->title ;
@@ -123,7 +152,8 @@ class PostController extends Controller
         $post-> update();
         $id = $post->post_id;
         return redirect()->route('post.show', compact('id'))->with('suc', 'Пост успешно отредактирован');
-
+        
+        
 
 
     }
@@ -137,6 +167,12 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
+        if(!$post) {
+            return redirect()->route('post.index')->withErrors('Пост не существует');
+            }
+        if($post->author_id != Auth::user()->id){
+            return redirect()->route('post.index')->withErrors('Не можете редактировать этот пост');
+            }
         $post->delete();
         return redirect()->route('post.index')->with('suc', 'Пост успешно удален');
 
